@@ -41,7 +41,7 @@ module.exports = (robot) ->
 
 prepareResult = (result) ->
   res_obj = exports.caniuse_data[result.string]
-  return "*#{res_obj.title}* (https://caniuse.com/#feat=#{result.string})\n Kategorie: #{res_obj.categories}\n #{res_obj.description}\n Browser: #{browserVersion res_obj.stats}"
+  return "*#{res_obj.title}* (https://caniuse.com/#feat=#{result.string})\n *Kategorie:* #{res_obj.categories}\n #{res_obj.description}\n *Browser:* #{browserVersion res_obj.stats}"
 
 browserVersion = (stats) ->
   support = []
