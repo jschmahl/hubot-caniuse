@@ -25,7 +25,7 @@ exports.caniuse_data = []
 url = "https://raw.github.com/Fyrd/caniuse/master/data.json"
 request {url: url}, (err, res, body) ->
   if err
-    console.log "Errors getting url: #{url}"
+    console.log "Fehler beim Zugriff auf die URL: #{url}"
     return
   exports.caniuse_data = JSON.parse(body).data
 
@@ -33,15 +33,15 @@ module.exports = (robot) ->
   robot.respond /(?:can.?i.?use )(.*)/i, (msg) ->
     results = fuzzy.filter(msg.match[1], Object.keys(exports.caniuse_data))
     if results.length > 2
-      msg.send "Found more than #{results.length - 1} results. Please narrow down your search to one of the following: \n `#{_.pluck(results, 'string').join(', ')}`"
+      msg.send "Habe mehr als #{results.length - 1} Ergebnisse gefunden. Bitte schränke deine Suche auf einen der folgenden Parameter ein: \n `#{_.pluck(results, 'string').join(', ')}`"
     else if results.length > 0
       msg.send prepareResult result for result in results
     else
-      msg.send "Nothing found for query *#{msg.match[1]}*. Try something else, or go to caniuse.com yourself."
+      msg.send "Es wurde nichts für *#{msg.match[1]}* gefunden. Versuch es mit etwas anderem oder gehe direkt auf caniuse.com."
 
 prepareResult = (result) ->
   res_obj = exports.caniuse_data[result.string]
-  return "*#{res_obj.title}* (http://caniuse.com/#feat=#{result.string}):\n `#{browserVersion res_obj.stats}`"
+  return "*#{res_obj.title}* (https://caniuse.com/#feat=#{result.string})\n Kategorie: #{res_obj.categories}\n #{res_obj.description}\n Browser: #{browserVersion res_obj.stats}"
 
 browserVersion = (stats) ->
   support = []
@@ -53,5 +53,6 @@ browserVersion = (stats) ->
           supported.push v.split('-')[0]
     min_supported = _.min(supported, (x) -> parseFloat(x))
     min_supported_clean = if (min_supported == Infinity) then "-" else "#{min_supported}+"
-    support.push "#{browser}:#{min_supported_clean}"
+    if browser == 'ie' || browser == 'edge' || browser == 'firefox' || browser == 'chrome' || browser == 'safari' || browser == 'ios_saf' || browser == 'and_chr'
+      support.push "#{browser}:#{min_supported_clean}"
   return support.join(', ')
